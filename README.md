@@ -1,10 +1,16 @@
 # jokerify
 jokerify your images via web api
 
-#### Example request
+### Request format
 ```
-https://jokerify.api.knockwin.com/?text=http://static6.businessinsider.com/image/55918b77ecad04a3465a0a63/nbc-fires-donald-trump-after-he-calls-mexicans-rapists-and-drug-runners.jpg
+https://<your deployment url>.com/?text=<your image url>
 ```
 
+#### Example request
+[https://jokerify.now.sh/?text=http://gazettereview.com/wp-content/uploads/2016/09/kevin-costner-80s-215x300.jpg](https://jokerify.now.sh/?text=http://gazettereview.com/wp-content/uploads/2016/09/kevin-costner-80s-215x300.jpg)
+
 #### Local development
-Download the source code and run `npm install` from within the project directory. Run `npm run dev` to start up a local development server. Run `npm start` for production mode.
+Get started by downloading the source code and then running `npm install` from within the project directory.
+
+ - `npm run dev` to start a local development server
+ - `npm start` to start a production server
