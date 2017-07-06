@@ -14,7 +14,7 @@ app.get('/', async (req, res) => {
 app.get('/view', async (req, res) => {
   const jokerified = await jokerify(req, res)
   const image = jokerified.attachments[0]
-	res.send(`<img src="${image.image_url}" width="${image.width}" height="${image.height}" />`)
+  res.send(`<img src="${image.image_url}" width="${image.width}" height="${image.height}" />`)
 })
 
 app.listen(8080, () => console.log('listening on port 8080'))
