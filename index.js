@@ -1,9 +1,10 @@
 const express = require('express')
 const app = express()
-const jokerify = require('./jokerify')
+const {jokerify, slacker, jokar} = require('./jokerify')
 const path = require('path')
 const { tmpdir } = require('os')
 
 app.use(express.static(tmpdir()))
-app.get('/', jokerify)
+app.get('/', slacker)
+app.get('/view', jokar)
 app.listen(8080, () => console.log('listening on port 8080'))
