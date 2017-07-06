@@ -16,8 +16,8 @@ async function jokerify(req, res) {
       throw new Error('image url to jokerify is required')
     }
 
-    if (text.includes('<')) {
-      throw new Error('get the fuck outta here with that weak shit')
+    if (text.includes('<') || text.includes('>')) {
+      throw new Error('get outta heaaa')
     }
 
     const id = uuid()
@@ -28,7 +28,6 @@ async function jokerify(req, res) {
       getImage('./assets/joker-cropped.png'),
       getImage(text)
     ])
-    
   
     if (image.bitmap.width > 800) {
       image.resize(800, jimp.AUTO)
@@ -38,11 +37,11 @@ async function jokerify(req, res) {
     const imageHeight = image.bitmap.height
 
     joker.resize(imageWidth * 0.5, jimp.AUTO)
-	
-    const jokerWidth = imageWidth - joker.bitmap.width;
-	  const jokerHeight = imageHeight - joker.bitmap.height;
     
-	  image
+    const jokerWidth = imageWidth - joker.bitmap.width
+    const jokerHeight = imageHeight - joker.bitmap.height
+    
+    image
       .composite(
         joker,
         jokerWidth,
@@ -54,13 +53,12 @@ async function jokerify(req, res) {
       response_type: 'in_channel',
       attachments: [
           {
-            'image_url': `https://${req.get('host')}/${filename}`,
-            'width': imageWidth,
-            'height': imageHeight
+            image_url: `https://${req.get('host')}/${filename}`,
+            width: imageWidth,
+            height: imageHeight
           }
       ]
-    };
-	
+    }
   } catch(err) {
     const message = err.message || err
 
