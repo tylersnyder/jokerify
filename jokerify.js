@@ -13,11 +13,11 @@ async function jokerify(req, res) {
     const text = xss(query.text)
 
     if (!text || !text.includes('//')) {
-      throw 'image url to jokerify is required'
+      throw new Error('image url to jokerify is required')
     }
 
     if (text.includes('<') || text.includes('>')) {
-      throw 'get outta heaaa'
+      throw new Error('get outta heaaa')
     }
 
     const id = uuid()
@@ -60,6 +60,6 @@ async function jokerify(req, res) {
       ]
     }
   } catch(err) {
-    throw err
+    throw err.message
   }
 }
