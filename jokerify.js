@@ -6,8 +6,6 @@ const { tmpdir } = require('os')
 const xss = require('xss')
 
 module.exports = jokerify
-module.exports = slacker
-module.exports = jokar
 
 async function jokerify(req, res) {
   try {
@@ -30,31 +28,35 @@ async function jokerify(req, res) {
       getImage('./assets/joker-cropped.png'),
       getImage(text)
     ])
+    
   
     if (image.bitmap.width > 800) {
       image.resize(800, jimp.AUTO)
     }
 
-    joker.resize(image.bitmap.width * 0.5, jimp.AUTO)
+    const imageWidth = image.bitmap.width
+    const imageHeight = image.bitmap.height
+
+    joker.resize(imageWidth * 0.5, jimp.AUTO)
 	
-    const joker_width = image.bitmap.width - joker.bitmap.width;
-	const joker_height = image.bitmap.height - joker.bitmap.height;
+    const jokerWidth = imageWidth - joker.bitmap.width;
+	  const jokerHeight = imageHeight - joker.bitmap.height;
     
-	image
+	  image
       .composite(
         joker,
-        joker_width,
-        joker_height
+        jokerWidth,
+        jokerHeight
       )
       .write(`${dir}/${filename}`)
 
     return {
       response_type: 'in_channel',
-      'attachments': [
+      attachments: [
           {
-            'image_url': `${req.protocol}://${req.get('host')}/${filename}`,
-			'width': joker_width,
-			'height': joker_height
+            'image_url': `https://${req.get('host')}/${filename}`,
+            'width': imageWidth,
+            'height': imageHeight
           }
       ]
     };
@@ -65,13 +67,4 @@ async function jokerify(req, res) {
     res.status(500)
        .send(message)
   }
-}
-
-async function slacker(req, res) {
-	res.send(jokerify(req,res));
-}
-
-async function jokar(req, res) {
-	const joker = jokerify(req, res)).attachments[0];
-	res.send(`<img src="${joker.image_url}" width="${joker.width}" height="${joker.height}" />`);
 }
