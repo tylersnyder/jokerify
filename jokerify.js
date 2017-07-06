@@ -1,4 +1,4 @@
-const jimp = require('jimp')
+const { AUTO } = require('jimp')
 const { parse } = require('url')
 const { getImage, getBuffer } = require('./util')
 const uuid = require('uuid/v1')
@@ -30,13 +30,13 @@ async function jokerify(req, res) {
     ])
   
     if (image.bitmap.width > 800) {
-      image.resize(800, jimp.AUTO)
+      image.resize(800, AUTO)
     }
 
     const imageWidth = image.bitmap.width
     const imageHeight = image.bitmap.height
 
-    joker.resize(imageWidth * 0.5, jimp.AUTO)
+    joker.resize(imageWidth * 0.5, AUTO)
     
     const jokerWidth = imageWidth - joker.bitmap.width
     const jokerHeight = imageHeight - joker.bitmap.height
