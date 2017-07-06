@@ -12,8 +12,10 @@ async function jokerify(req, res) {
       throw new Error('image url to jokerify is required')
     }
 
-    const joker = await getImage('./src/assets/joker-cropped.png')
-    const image = await getImage(text)
+    const [ joker, image ] = await Promise.all([
+      getImage('./src/assets/joker-cropped.png'),
+      getImage(text)
+    ])
   
     if (image.bitmap.width > 800) {
       image.resize(800, jimp.AUTO)
