@@ -13,7 +13,8 @@
   "dependencies": {
     "express": "^4.15.3",
     "jimp": "^0.2.28",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "xss": "^0.3.3"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
