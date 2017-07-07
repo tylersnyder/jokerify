@@ -17,10 +17,6 @@ async function jokerify(req, res) {
       throw new Error('image url to jokerify is required')
     }
 
-    if (text.includes('<') || text.includes('>')) {
-      throw new Error('get outta heaaa')
-    }
-
     const id = uuid()
     const dir = tmpdir()
     const filename = `${id}.png`
