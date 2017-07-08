@@ -1,10 +1,11 @@
 const { AUTO } = require('jimp')
 const { parse } = require('url')
-const { isUri } = require('valid-url')
+const { isWebUri } = require('valid-url')
 const { getImage, getBuffer } = require('./util')
 const uuid = require('uuid/v1')
 const { tmpdir } = require('os')
 const xss = require('xss')
+const isImage = require('is-image')
 
 module.exports = jokerify
 
@@ -13,7 +14,7 @@ async function jokerify(req, res) {
     const query = parse(req.url, true).query
     const text = xss(query.text)
 
-    if (!text || !isUri(text)) {
+    if (!text || !isWebUri(text) || !isImage(text)) {
       throw new Error('image url to jokerify is required')
     }
 
