@@ -2,14 +2,17 @@ const express = require('express')
 const app = express()
 const jokerify = require('./jokerify')
 const { tmpdir } = require('os')
+const dir = tmpdir()
 
-app.use(express.static(tmpdir()))
+app.use(express.static(dir))
 
 app.get('/', async (req, res) => {
   try {
-    const jokerified = await jokerify(req, res)
-    const image = jokerified.attachments[0]
-    res.send(`<img src="${image.image_url}" width="${image.width}" height="${image.height}" />`)
+    const result = await jokerify(req, res)
+    const { filename } = result.attachments[0]
+    res.sendFile(filename, {
+      root: dir
+    })
   } catch(err) {
     res.status(500)
        .send(err)
@@ -18,8 +21,8 @@ app.get('/', async (req, res) => {
 
 app.get('/api/slack', async (req, res) => {
   try {
-    const jokerified = await jokerify(req, res)
-    res.send(jokerified)
+    const result = await jokerify(req, res)
+    res.send(result)
   } catch(err) {
     res.status(500)
        .send(err)
