@@ -69,6 +69,7 @@ function compositeAndWrite({ canvas, joker, filename }) {
 
     const { width } = canvas.bitmap
     const { height } = canvas.bitmap
+    joker.resize(width * 0.5, AUTO)
     const jokerWidth = width - joker.bitmap.width
     const jokerHeight = height - joker.bitmap.height
 
