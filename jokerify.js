@@ -14,6 +14,7 @@ async function jokerify(req, res) {
   try {
     const query = parse(req.url, true).query
     const text = xss(query.text)
+    const responseUrl = xss(query.response_url)
 
     if (!text) {
       throw new Error('image url to jokerify is required')
@@ -36,6 +37,7 @@ async function jokerify(req, res) {
     
     return {
       response_type: 'in_channel',
+      response_url: responseUrl,
       attachments: [
           {
             filename,

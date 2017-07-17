@@ -3,6 +3,7 @@ const app = express()
 const jokerify = require('./jokerify')
 const { tmpdir } = require('os')
 const dir = tmpdir()
+const request = require('request')
 
 app.use(express.static(dir))
 
@@ -21,11 +22,26 @@ app.get('/', async (req, res) => {
 
 app.get('/api/slack', async (req, res) => {
   try {
+    res.send({'text':'working on it...'})
+
     const result = await jokerify(req, res)
-    res.send(result)
+    if(result.response_url.length > 0){
+      request.post(
+      result.response_url,
+        {
+          response_type: 'in_channel',
+          attachments: [
+              {
+                filename: result.filename,
+                image_url: result.image_url,
+              }
+          ]
+        }
+      );
+    }
+    
   } catch(err) {
-    res.status(500)
-       .send(err)
+      console.log(err);
   }
 })
 
