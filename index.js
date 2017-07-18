@@ -30,6 +30,7 @@ app.get('/api/slack', async (req, res) => {
       const payload = {
         response_type: 'in_channel',
         response_url: result.responseUrl,
+        replace_original: true,
         attachments: result.attachments
       }
 
