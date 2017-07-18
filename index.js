@@ -21,7 +21,10 @@ app.get('/', async (req, res) => {
 
 app.get('/api/slack', async (req, res) => {
   try {
-    res.send({'text':'working on it...'})
+    res.send({
+      response_type: 'in_channel',
+      text: 'working on it...'
+    })
 
     const result = await jokerify(req, res)
     const { response_url } = result
