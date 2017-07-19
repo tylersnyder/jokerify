@@ -71,12 +71,15 @@ function compositeAndWrite({ canvas, joker, filename }) {
 
     const { width } = canvas.bitmap
     const { height } = canvas.bitmap
-    joker.resize(width * 0.5, AUTO)
+    
+    if(width<height)
+      joker.resize(width * 0.5, AUTO)
+    else
+      joker.resize(AUTO, height * 0.5)
+
     const jokerWidth = width - joker.bitmap.width
     const jokerHeight = height - joker.bitmap.height
 
-    joker.resize(width * 0.5, AUTO)
-    
     canvas
       .composite(joker, jokerWidth, jokerHeight)
       .write(`${dir}/${filename}`, (err) => {
