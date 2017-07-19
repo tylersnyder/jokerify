@@ -51,16 +51,21 @@ async function jokerify(req, res) {
   }
 }
 
-async function GetRandomImageURL(){
+async function GetRandomImageURL() {
   return new Promise((resolve, reject) => {
-    get('http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json', function(error, response, body){
-      var data = JSON.parse(body);
-      var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
-      
-      return resolve(image_src);
+    get('http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json', function(error, response, body) {
+      try {
+        var data = JSON.parse(body);
+        var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
+        return resolve(image_src);
+      } catch(error) {
+        console.log(error)
+        reject(error.message)
+      }
     })
   })
 }
+
 function parseInput(input) {
   const [ url, caption ] = input.split(' ')
 
