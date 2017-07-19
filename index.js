@@ -45,7 +45,7 @@ app.get('/api/slack', async (req, res) => {
   } catch(err) {
     console.log(err);
     res.status(200)
-       .send(err)
+       .send({ text: err.message })
   }
 })
 
