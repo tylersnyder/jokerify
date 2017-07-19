@@ -53,8 +53,8 @@ async function jokerify(req, res) {
 
 async function GetRandomImageURL(){
   return new Promise((resolve, reject) => {
-    get('http://api.flickr.com/services/feeds/photos_public.gne?format=json', function(error, response, body){
-      var data = JSON.parse(body.replace('jsonFlickrFeed(','').slice(0, -1));
+    get('http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json', function(error, response, body){
+      var data = JSON.parse(body);
       var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
       
       return resolve(image_src);
