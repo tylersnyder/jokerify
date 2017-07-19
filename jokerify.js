@@ -7,19 +7,20 @@ const { tmpdir } = require('os')
 const xss = require('xss')
 const isImage = require('is-image')
 const dir = tmpdir()
+const { get } = require('request')
 
 module.exports = jokerify
 
 async function jokerify(req, res) {
   try {
     const query = parse(req.url, true).query
-    const text = xss(query.text)
+    var text = xss(query.text)
     const responseUrl = xss(query.response_url)
 
     if (!text) {
-      throw new Error('image url to jokerify is required')
+      text =  await GetRandomImageURL();
     }
-
+   
     const { url, caption } = parseInput(text)
     const id = uuid()
     const filename = `${id}.png`
@@ -50,6 +51,16 @@ async function jokerify(req, res) {
   }
 }
 
+async function GetRandomImageURL(){
+  return new Promise((resolve, reject) => {
+    get('http://api.flickr.com/services/feeds/photos_public.gne?format=json', function(error, response, body){
+      var data = JSON.parse(body.replace('jsonFlickrFeed(','').slice(0, -1));
+      var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
+      
+      return resolve(image_src);
+    })
+  })
+}
 function parseInput(input) {
   const [ url, caption ] = input.split(' ')
 
