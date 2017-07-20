@@ -18,10 +18,17 @@ async function jokerify(req) {
     var text = xss(query.text)
     const responseUrl = xss(query.response_url)
 
-    if (!text) {
+    if (!text || text.length ==0) {
       text =  await GetRandomImageURL();
     }
-   
+    else{
+      if (!isWebUri(text) || !isImage(text)) {
+        text =  await GetRandomImageURL(text);
+      }
+    }
+    
+    
+
     const { url, caption } = parseInput(text)
     const id = uuid()
     const filename = `${id}.png`
@@ -52,22 +59,30 @@ async function jokerify(req) {
   }
 }
 
-async function GetRandomImageURL() {
+async function GetRandomImageURL(search) {
+  var url ='http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json';
+
+  if(search && search.length>0){
+    url+='&tags='+search;
+  }
+
   return new Promise((resolve, reject) => {
-    get('http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json', function(error, response, body) {
-      var data = JSON.parse(body.replace(/\\'/g, "'"));
-      var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
-      return resolve(image_src);
+    get(url, function(error, response, body) {
+      try{
+        var data = JSON.parse(body.replace(/\\'/g, "'"));
+        var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
+        return resolve(image_src);
+      }
+      catch(err){
+        return resolve('https://s-media-cache-ak0.pinimg.com/736x/91/c2/f8/91c2f8931b4954ab41f665e88b1e1acf--paula-deen-happy-thanksgiving.jpg');
+      }
+      
     })
   })
 }
 
 function parseInput(input) {
   const [ url, caption ] = input.split(' ')
-
-  if (!isWebUri(url) || !isImage(url)) {
-    throw new Error('image url to jokerify is required')
-  }
 
   return {
     url,
