@@ -12,7 +12,7 @@ class jokerify_handler extends message_handler {
 
     async emit(message, cmd_args) {
         const result = await jokerify(cmd_args)
-            .then(response => message.reply('', { file: `${this.discord.url}/${response.attachments[0].filename}` }))
+            .then(response => message.reply('', { file: response.attachments[0].image_url }))
             .catch(error => Promise.reject(error)) //forward exceptions up the stack.
     }
 }

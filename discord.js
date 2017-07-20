@@ -76,11 +76,10 @@ class discord_driver {
         const emitter = ((!cmd || !this.message_handlers[cmd]) && this.message_handlers.default)
             ? this.message_handlers.default
             : this.message_handlers[cmd] || null
-
-        if (!emitter)
-            return
-
-        return emitter.emit(message, cmd_args).catch(error => console.error(error))
+        
+        return emitter
+            ? emitter.emit(message, cmd_args).catch(error => console.error(error))
+            : null
     }
 }
 
