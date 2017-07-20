@@ -1,12 +1,12 @@
-const { Https } = require('https')
 const Discord = require('discord.js')
 const client = new Discord.Client()
 
 // SETTINGS
 const client_id = ''
 const token = ''
+const command_delimiter = '!'
 const max_arguments = 3
-const debug_mode = false
+const debug_mode = true
 // END SETTINGS
 
 class message_handler {
@@ -35,6 +35,8 @@ class discord_driver {
 
         client.on('ready', () => this.onReady)
         client.on('message', () => this.onMessage)
+        client.on('error', () => console.error(error))
+
         if (debug_mode) client.on('debug', (info) => console.info(info))
 
         client.login(token)
@@ -54,30 +56,22 @@ class discord_driver {
         console.log(`[Discord]: Registered '${handler.type}' as a message handler.`)
     }
 
-    async authenticate() {
-        return https.get(`https://discordapp.com/oauth2/authorize?&client_id=${client_id}&scope=bot&permissions=0`, (res) => {
-            //TODO: Figure out what the API call is to authorize bot to server.
-        })
-    }
-
     onReady() {
-        console.log('Discord Driver online.')
+        console.log('[Discord]: Bot Client Ready.')
     }
 
     onMessage(message) {
-        console.log('on message')
-        console.log(message)
+        if (message.author.bot || !message.content.startsWith(command_delimiter)) return
+        
         const parsed_message = parseMessageContent(message.content)
-        const cmd = parsed_message[parsed_message.length - 1].startsWith('/')
-            ? parsed_message.pop()
-            : null
+        const cmd = parsed_message.pop().replace(command_delimiter, '')
         
         const emitter = ((!cmd || !this.message_handlers[cmd]) && this.message_handlers.default)
             ? this.message_handlers.default
             : this.message_handlers[message] || null
 
         if (!emitter)
-            return message.reply('Whut?')
+            return
 
         return emitter.emit(cmd, parsed_message)
     }
