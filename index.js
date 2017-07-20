@@ -6,7 +6,9 @@ const root = tmpdir()
 const { post } = require('request')
 const { command } = require('./command')
 const { parse } = require('url')
-const { discord } = require('./discord')
+
+//discord
+const { discord_driver } = require('./discord')
 const { jokerify_handler } = require('./discord/jokerify_handler')
 
 app.use(express.static(root))
@@ -56,4 +58,4 @@ app.get('/api/slack', async (req, res) => {
 })
 
 app.listen(8080, () => console.log('listening on port 8080'))
-new jokerify_handler(new discord())
+new jokerify_handler(new discord_driver())

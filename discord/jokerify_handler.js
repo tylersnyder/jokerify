@@ -4,7 +4,7 @@ const { message_handler } = require('../discord')
 const { command } = require('../command')
 const jokerify = require('../jokerify')
 
-export class jokerify_handler {
+class jokerify_handler {
     constructor(discord) {
         this.type = 'default';
         discord.registerMessageHandler(this);
@@ -17,3 +17,5 @@ export class jokerify_handler {
             .catch(error => Promise.reject(error)) //forward exceptions up the stack.
     }
 }
+
+module.exports = { jokerify_handler }
