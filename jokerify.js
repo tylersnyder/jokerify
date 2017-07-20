@@ -12,51 +12,36 @@ const { command } = require('./command');
 
 module.exports = jokerify
 
-async function jokerify(req) {
-    try {
-    const query = req.query;
-    var text = xss(query.text)
-    const responseUrl = xss(query.response_url)
-
-    if (!text || text.length ==0) {
-      text =  await GetRandomImageURL();
-    }
-    else{
-      if (!isWebUri(text) || !isImage(text)) {
-        text =  await GetRandomImageURL(text);
-      }
-    }
-    
-    
-
-    const { url, caption } = parseInput(text)
-    const id = uuid()
-    const filename = `${id}.png`
+async function jokerify(text) {
+    const source_url = xss(text).trim()
+    let request = (!source_url
+        ? await GetRandomImageURL()
+        : (!isWebUri(source_url) || !isImage(source_url)
+            ? await GetRandomImageURL(source_url)
+            : source_url
+        )
+    )
+    const { url, caption } = parseInput(request)
+    const filename = `${uuid()}.png`
     
     const [ joker, canvas ] = await Promise.all([
       getImage('./assets/joker-cropped.png'),
       getImage(url)
     ])
   
-    const result = await compositeAndWrite({ canvas, joker, filename })
-
-    if (result !== 'success') {
-      throw result
-    }
-    
-    return {
-      response_type: 'in_channel',
-      response_url: responseUrl,
-      attachments: [
-          {
-            filename,
-            image_url: `${req.protocol}://${req.get('host')}/${filename}`,
-          }
-      ]
-    }
-  } catch(err) {
-    throw err.message
-  }
+    return (await compositeAndWrite({ canvas, joker, filename }) !== 'success'
+        ? Promise.reject('Failed to compose Jokerified image!')
+        : {
+            response_type: 'in_channel',
+            response_url: source_url,
+            attachments: [
+                {
+                    filename,
+                    // image_url: `${req.protocol}://${req.get('host')}/${filename}`,
+                }
+            ]
+        }
+    )
 }
 
 async function GetRandomImageURL(search) {

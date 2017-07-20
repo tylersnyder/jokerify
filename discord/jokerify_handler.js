@@ -12,10 +12,7 @@ class jokerify_handler {
     }
 
     async emit(message, cmd_args) {
-        const o = cmd_args.join();
-        console.log(o);
-        const query = parse(o, true).query
-        const result = await jokerify(new command(o, query))
+        const result = await jokerify(cmd_args)
             .then(response => message.reply(response.response_url))
             .catch(error => Promise.reject(error)) //forward exceptions up the stack.
     }

@@ -4,7 +4,6 @@ const jokerify = require('./jokerify')
 const { tmpdir } = require('os')
 const root = tmpdir()
 const { post } = require('request')
-const { command } = require('./command')
 const { parse } = require('url')
 
 //discord
@@ -12,50 +11,54 @@ const { discord_driver } = require('./discord')
 const { jokerify_handler } = require('./discord/jokerify_handler')
 
 app.use(express.static(root))
-
-app.get('/', async (req, res) => {
-    try {
+const rootRequestHandler = async (req, res) => {
     const query = parse(req.url, true).query
-    const result = await jokerify(new command(req.url, query))
+    const result = await jokerify(query.response_url || query.text)
     const { filename } = result.attachments[0]
 
     res.sendFile(filename, { root })
-  } catch(err) {
-    console.log(err)
+}
+
+rootRequestHandler.catch((error) => {
+    console.error(err)
     res.status(500)
-       .send(err)
-  }
+        .send(err)
 })
 
-app.get('/api/slack', async (req, res) => {
-  try {
+app.get('/', rootRequestHandler)
+
+const slackRequestHandler = async (req, res) => {
     res.send({
-      response_type: 'in_channel',
-      text: 'working on it...'
+        response_type: 'in_channel',
+        text: 'working on it...'
     })
+    const query = parse(req.url, true).query
+    const result = await jokerify(query.response_url || query.text)
+    const response_url = `${req.protocol}://${req.get('host')}/${result.filename}`
 
-    const result = await jokerify(req, res)
-    const { response_url } = result
+    if (!result) 
+        return Promise.reject(new Error('Empty result returned from the Jokerifier!'))
 
-    if (response_url) {
-      const payload = {
+    const payload = {
         response_type: 'in_channel',
         response_url: result.responseUrl,
         replace_original: true,
         attachments: result.attachments
-      }
-
-      console.log('slack response url: ', response_url)
-      console.log('slack post payload: ', payload)
-    
-      post(response_url, { json: payload })
     }
-  } catch(err) {
-    console.log(err);
+
+    console.log('slack response url: ', response_url)
+    console.log('slack post payload: ', payload)
+
+    post(response_url, { json: payload })
+    
+}
+slackRequestHandler.catch((error) => {
+    console.error(error);
     res.status(200)
-       .send({ text: err.message })
-  }
+        .send({ text: error.message })
 })
+
+app.get('/api/slack', slackRequestHandler)
 
 app.listen(8080, () => console.log('listening on port 8080'))
 new jokerify_handler(new discord_driver())
