@@ -22,9 +22,8 @@ class message_handler {
 }
 
 const parseMessageContent = (content) =>
-    (content || '')
+    `${content}`
     .split(' ', max_arguments + 1)
-    .filter(parameter => parameter)
     .reverse()
 
 class discord_driver {
@@ -53,7 +52,7 @@ class discord_driver {
     }
 
     onMessage(message) {
-        const parsed_message = parseMessageContent(message.content) || ['']
+        const parsed_message = parseMessageContent(message.content)
         const cmd = parsed_message[parsed_message.length - 1].startsWith('/')
             ? parsed_message.pop()
             : null
