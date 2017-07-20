@@ -4,7 +4,7 @@ const client = new Discord.Client()
 // SETTINGS
 const url = 'http://localhost/'
 const client_id = ''
-const token = 'MzM3NTg3MjQ0MjIxMjAyNDMz.DFKaWg.nkL9uwljJ_qJl4EKofplepguPT8'
+const token = 'MzM3NTg3MjQ0MjIxMjAyNDMz.DFKaWg.nkL9uwljJ_qJl4EKofplepguPT8' //NOTE: This token is a dud!!!
 const command_delimiter = '!'
 const max_arguments = 3
 const debug_mode = true

@@ -16,11 +16,11 @@ let rootRequestHandler = async (req, res) => {
         const query = parse(req.url, true).query
         const result = await jokerify(query.text)
 
-        res.sendFile(result.attachments[0], { root })
+        res.sendFile(`${req.protocol}://${req.get('host')}/${result.attachments[0].filename}`, { root })
     } catch (error) {
-        console.error(err)
+        console.error(error, error.stack)
         res.status(500)
-            .send(err)
+            .send(error)
     }
 }
 
@@ -34,7 +34,7 @@ const slackRequestHandler = async (req, res) => {
         })
         const query = parse(req.url, true).query
         const result = await jokerify(query.response_url || query.text)
-        const response_url = `${req.protocol}://${req.get('host')}/${result.filename}`
+        const response_url = `${req.protocol}://${req.get('host')}/${result.attachments[0].filename}`
 
         if (!result)
             throw new Error('Empty result returned from the Jokerifier!')
@@ -51,7 +51,7 @@ const slackRequestHandler = async (req, res) => {
 
         post(response_url, { json: payload })
     } catch (error) {
-        console.error(error);
+        console.error(error, error.stack);
         res.status(200)
             .send({ text: error.message })
     }
