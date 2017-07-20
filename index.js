@@ -4,13 +4,17 @@ const jokerify = require('./jokerify')
 const { tmpdir } = require('os')
 const root = tmpdir()
 const { post } = require('request')
+const { command } = require('./command')
+const { parse } = require('url')
 
 app.use(express.static(root))
 
 app.get('/', async (req, res) => {
-  try {
-    const result = await jokerify(req, res)
+    try {
+    const query = parse(req.url, true).query
+    const result = await jokerify(new command(req.url, query))
     const { filename } = result.attachments[0]
+
     res.sendFile(filename, { root })
   } catch(err) {
     console.log(err)

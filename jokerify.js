@@ -8,12 +8,13 @@ const xss = require('xss')
 const isImage = require('is-image')
 const dir = tmpdir()
 const { get } = require('request')
+const { command } = require('./command');
 
 module.exports = jokerify
 
-async function jokerify(req, res) {
-  try {
-    const query = parse(req.url, true).query
+async function jokerify(req) {
+    try {
+    const query = req.query;
     var text = xss(query.text)
     const responseUrl = xss(query.response_url)
 

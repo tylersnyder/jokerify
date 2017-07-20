@@ -11,6 +11,7 @@
   "author": "Tyler Snyder <tylersnyder@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "discord.js": "^11.1.0",
     "express": "^4.15.3",
     "is-image": "^2.0.0",
     "jimp": "^0.2.28",
