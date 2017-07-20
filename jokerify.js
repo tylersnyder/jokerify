@@ -11,7 +11,7 @@ const { get } = require('request')
 
 module.exports = jokerify
 
-async function jokerify(text) {
+async function jokerify(base_url, text) {
     const source_url = xss(text).trim()
     let request = (!source_url
         ? await GetRandomImageURL()
@@ -36,7 +36,7 @@ async function jokerify(text) {
             attachments: [
                 {
                     filename,
-                    // image_url: `${req.protocol}://${req.get('host')}/${filename}`,
+                    image_url: `${base_url}/${filename}`,
                 }
             ]
         }
@@ -44,25 +44,21 @@ async function jokerify(text) {
 }
 
 async function GetRandomImageURL(search) {
-  var url ='http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json';
+    let url = 'http://api.flickr.com/services/feeds/photos_public.gne?nojsoncallback=1&format=json';
+    const fallback_img = 'https://s-media-cache-ak0.pinimg.com/736x/91/c2/f8/91c2f8931b4954ab41f665e88b1e1acf--paula-deen-happy-thanksgiving.jpg'
 
-  if(search && search.length>0){
-    url+='&tags='+search;
-  }
+    if (!search || search.length < 1) return fallback_img
+    url += '&tags=' + search;
 
-  return new Promise((resolve, reject) => {
-    get(url, function(error, response, body) {
-      try{
-        var data = JSON.parse(body.replace(/\\'/g, "'"));
-        var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
-        return resolve(image_src);
-      }
-      catch(err){
-        return resolve('https://s-media-cache-ak0.pinimg.com/736x/91/c2/f8/91c2f8931b4954ab41f665e88b1e1acf--paula-deen-happy-thanksgiving.jpg');
-      }
-      
+    return get(url, function (error, response, body) {
+        try {
+            const data = JSON.parse(body.replace(/\\'/g, "'"))
+            return data.items[~~(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b")
+        }
+        catch (err) {
+            return fallback_img
+        }
     })
-  })
 }
 
 function parseInput(input) {
@@ -93,6 +89,7 @@ function compositeAndWrite({ canvas, joker, filename }) {
 
     canvas
       .composite(joker, jokerWidth, jokerHeight)
+
       .write(`${dir}/${filename}`, (err) => {
         if (err) {
           return reject(err)

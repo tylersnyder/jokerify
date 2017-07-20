@@ -4,7 +4,7 @@ const client = new Discord.Client()
 // SETTINGS
 const url = 'http://localhost/'
 const client_id = ''
-const token = 'MzM3NTg3MjQ0MjIxMjAyNDMz.DFKaWg.nkL9uwljJ_qJl4EKofplepguPT8' //NOTE: This token is a dud!!!
+const token = '' 
 const command_delimiter = '!'
 const max_arguments = 3
 const debug_mode = true
@@ -14,17 +14,20 @@ if (!token) throw new Error('[Discord]: Empty token found! Please change the app
 
 class message_handler {
     constructor(command_type, callback) {
-        if (!command_type || (!callback || !callback instanceof Promise))
+        if (!command_type || (callback && !callback instanceof Promise))
             throw new Error(`InvalidArgumentException: Malformed message_handler Registration.`)
 
         this.type = command_type
-        this.emit = callback(cmd, parsed_message)
+        if (!callback) return
 
+        this.emit = callback(parsed_message)
         this.emit.catch(error => this.handle_error)
     }
 
-    static handle_error(error) { return console.error(error) }
-    static is_handler(obj) { obj && obj.type && obj.emit && obj.emit instanceof Promise }
+    async emit(message, cmd_args) {}
+
+    handle_error(error) { return console.error(error) }
+    is_handler(obj) { obj && obj.type && obj.emit && obj.emit instanceof Promise }
 }
 
 const parseMessageContent = (content) =>
@@ -33,9 +36,9 @@ const parseMessageContent = (content) =>
         .reverse()
 
 class discord_driver {
-    constructor() {
+    constructor(settings) {
         this.message_handlers = {}
-        this.url = url;
+        this.url = settings.url || url;
 
         client.on('ready', () => this.onReady())
         client.on('message', (message) => this.onMessage(message))
@@ -44,7 +47,6 @@ class discord_driver {
         if (debug_mode) client.on('debug', (info) => console.info(info))
 
         client.login(token)
-            .then((login) => console.log(`Successfully logged in with ${login}`))
             .catch(error => console.error(error))
     }
 
@@ -73,7 +75,7 @@ class discord_driver {
         
         const emitter = ((!cmd || !this.message_handlers[cmd]) && this.message_handlers.default)
             ? this.message_handlers.default
-            : this.message_handlers[message] || null
+            : this.message_handlers[cmd] || null
 
         if (!emitter)
             return
