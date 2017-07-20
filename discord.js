@@ -2,12 +2,11 @@ const Discord = require('discord.js')
 const client = new Discord.Client()
 
 // SETTINGS
-const url = 'http://localhost/'
 const client_id = ''
-const token = '' 
+const token = ''
 const command_delimiter = '!'
 const max_arguments = 3
-const debug_mode = true
+const debug_mode = false
 // END SETTINGS
 
 if (!token) throw new Error('[Discord]: Empty token found! Please change the appropriate settings in discord.js')
@@ -38,7 +37,7 @@ const parseMessageContent = (content) =>
 class discord_driver {
     constructor(settings) {
         this.message_handlers = {}
-        this.url = settings.url || url;
+        this.url = settings.url;
 
         client.on('ready', () => this.onReady())
         client.on('message', (message) => this.onMessage(message))
@@ -59,7 +58,7 @@ class discord_driver {
 
         if (this.message_handlers[handler.type]) return
         this.message_handlers[handler.type] = handler
-
+        
         console.log(`[Discord]: Registered '${handler.type}' as a message handler.`)
     }
 

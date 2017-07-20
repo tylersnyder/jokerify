@@ -5,13 +5,13 @@ const jokerify = require('../jokerify')
 
 class jokerify_handler extends message_handler {
     constructor(discord) {
-        super('default')
+        super('jokerify')
         this.discord = discord;
         discord.registerMessageHandler(this);
     }
 
     async emit(message, cmd_args) {
-        const result = await jokerify(cmd_args)
+        const result = await jokerify(this.discord.url, cmd_args.join())
             .then(response => message.reply('', { file: response.attachments[0].image_url }))
             .catch(error => Promise.reject(error)) //forward exceptions up the stack.
     }
