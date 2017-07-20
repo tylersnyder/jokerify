@@ -2,6 +2,7 @@ const Discord = require('discord.js')
 const client = new Discord.Client()
 
 // SETTINGS
+const url = 'http://localhost/'
 const client_id = ''
 const token = ''
 const command_delimiter = '!'
@@ -26,16 +27,17 @@ class message_handler {
 
 const parseMessageContent = (content) =>
     `${content}`
-    .split(' ', max_arguments + 1)
-    .reverse()
+        .split(' ', max_arguments + 1)
+        .reverse()
 
 class discord_driver {
     constructor() {
         this.message_handlers = {}
+        this.url = url;
 
-        client.on('ready', () => this.onReady)
-        client.on('message', () => this.onMessage)
-        client.on('error', () => console.error(error))
+        client.on('ready', () => this.onReady())
+        client.on('message', (message) => this.onMessage(message))
+        client.on('error', (error) =>  console.error(error))
 
         if (debug_mode) client.on('debug', (info) => console.info(info))
 
@@ -63,8 +65,8 @@ class discord_driver {
     onMessage(message) {
         if (message.author.bot || !message.content.startsWith(command_delimiter)) return
         
-        const parsed_message = parseMessageContent(message.content)
-        const cmd = parsed_message.pop().replace(command_delimiter, '')
+        const cmd_args = parseMessageContent(message.content)
+        const cmd = cmd_args.pop().replace(command_delimiter, '')
         
         const emitter = ((!cmd || !this.message_handlers[cmd]) && this.message_handlers.default)
             ? this.message_handlers.default
@@ -73,7 +75,7 @@ class discord_driver {
         if (!emitter)
             return
 
-        return emitter.emit(cmd, parsed_message)
+        return emitter.emit(message, cmd_args).catch(error => console.error(error))
     }
 }
 
