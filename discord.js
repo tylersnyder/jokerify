@@ -1,7 +1,12 @@
 const { Discord } = require('discord.js');
 
 const client = new Discord.Client()
+
+// SETTINGS
 const token = ''
+const max_arguments = 3
+
+// END SETTINGS
 
 export class message_handler {
     constructor(command_type, callback) {
@@ -9,7 +14,7 @@ export class message_handler {
             throw new Error(`InvalidArgumentException: Malformed message_handler Registration.`)
 
         this.type = command_type
-        this.emit = (message) => callback(message)
+        this.emit = (cmd, parsed_message) => callback(cmd, parsed_message)
         
         this.emit.catch(error => this.handle_error)
     }
@@ -17,6 +22,12 @@ export class message_handler {
     static handle_error = (error) => console.error(error)
     static is_handler = (obj) => obj && obj.type && obj.emit && obj.emit instanceof Promise
 }
+
+const parseMessageContent = (content) =>
+    (content as string)
+    .split(' ', max_arguments + 1)
+    .filter(parameter => parameter)
+    .reverse()
 
 export class discord_driver {
     constructor() {
@@ -34,7 +45,6 @@ export class discord_driver {
             throw new Error('InvalidArgumentException: Malformed message_handler')
 
         if (this.message_handlers[handler.type]) return
-
         this.message_handlers[handler.type] = handler
     }
 
@@ -43,14 +53,18 @@ export class discord_driver {
     }
 
     onMessage = (message) => {
-        const cmd = message || '';
-        const emitter = (!this.message_handlers[cmd] && this.message_handlers.default)
+        const parsed_message = parseMessageContent(message.content) || ['']
+        const cmd = parsed_message[parsed_message.length - 1].startsWith('/')
+            ? parsed_message.pop()
+            : null
+        
+        const emitter = ((!cmd || !this.message_handlers[cmd]) && this.message_handlers.default)
             ? this.message_handlers.default
             : this.message_handlers[message] || null
 
         if (!emitter)
             return message.reply('Whut?')
 
-        return emitter.emit(message)
+        return emitter.emit(cmd, parsed_message)
     }
 }
