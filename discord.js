@@ -3,15 +3,15 @@ const { Discord } = require('discord.js');
 const client = new Discord.Client()
 const token = ''
 
-class message_handler {
+export class message_handler {
     constructor(command_type, callback) {
         if (!command_type || (!callback || !callback instanceof Promise))
-            throw new Error(`InvalidArgumentException: Malformed message_handler Registration.`);
+            throw new Error(`InvalidArgumentException: Malformed message_handler Registration.`)
 
-        this.type = command_type;
-        this.emit = (message) => callback(message);
+        this.type = command_type
+        this.emit = (message) => callback(message)
         
-        this.emit.catch(error => this.handle_error);
+        this.emit.catch(error => this.handle_error)
     }
 
     static handle_error = (error) => console.error(error)
@@ -29,13 +29,13 @@ export class discord_driver {
     static client = () => client
     static token = () => token
 
-    static registerMessageHandlers(handler) {
+    static registerMessageHandler(handler) {
         if (!handler instanceof message_handler && !message_handler.is_handler(handler))
-            throw new Error('InvalidArgumentException: Malformed message_handler');
+            throw new Error('InvalidArgumentException: Malformed message_handler')
 
-        if (this.message_handlers[handler.type]) return;
+        if (this.message_handlers[handler.type]) return
 
-        this.message_handlers[handler.type] = handler;
+        this.message_handlers[handler.type] = handler
     }
 
     onReady = () => {
@@ -46,10 +46,10 @@ export class discord_driver {
         const cmd = message || '';
         const emitter = (!this.message_handlers[cmd] && this.message_handlers.default)
             ? this.message_handlers.default
-            : this.message_handlers[message] || null;
+            : this.message_handlers[message] || null
 
         if (!emitter)
-            return message.reply('Whut?');
+            return message.reply('Whut?')
 
         return emitter.emit(message)
     }
