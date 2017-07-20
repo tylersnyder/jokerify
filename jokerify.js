@@ -67,9 +67,15 @@ async function GetRandomImageURL(search) {
 
   return new Promise((resolve, reject) => {
     get(url, function(error, response, body) {
-      var data = JSON.parse(body.replace(/\\'/g, "'"));
-      var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
-      return resolve(image_src);
+      try{
+        var data = JSON.parse(body.replace(/\\'/g, "'"));
+        var image_src = data.items[Math.floor(Math.random() * data.items.length)]['media']['m'].replace("_m", "_b");
+        return resolve(image_src);
+      }
+      catch(err){
+        return resolve('https://s-media-cache-ak0.pinimg.com/736x/91/c2/f8/91c2f8931b4954ab41f665e88b1e1acf--paula-deen-happy-thanksgiving.jpg');
+      }
+      
     })
   })
 }
