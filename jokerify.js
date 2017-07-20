@@ -8,7 +8,6 @@ const xss = require('xss')
 const isImage = require('is-image')
 const dir = tmpdir()
 const { get } = require('request')
-const { command } = require('./command');
 
 module.exports = jokerify
 

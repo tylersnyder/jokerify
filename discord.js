@@ -4,11 +4,13 @@ const client = new Discord.Client()
 // SETTINGS
 const url = 'http://localhost/'
 const client_id = ''
-const token = ''
+const token = 'MzM3NTg3MjQ0MjIxMjAyNDMz.DFKaWg.nkL9uwljJ_qJl4EKofplepguPT8'
 const command_delimiter = '!'
 const max_arguments = 3
 const debug_mode = true
 // END SETTINGS
+
+if (!token) throw new Error('[Discord]: Empty token found! Please change the appropriate settings in discord.js')
 
 class message_handler {
     constructor(command_type, callback) {
@@ -42,6 +44,7 @@ class discord_driver {
         if (debug_mode) client.on('debug', (info) => console.info(info))
 
         client.login(token)
+            .then((login) => console.log(`Successfully logged in with ${login}`))
             .catch(error => console.error(error))
     }
 

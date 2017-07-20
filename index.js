@@ -11,52 +11,51 @@ const { discord_driver } = require('./discord')
 const { jokerify_handler } = require('./discord/jokerify_handler')
 
 app.use(express.static(root))
-const rootRequestHandler = async (req, res) => {
-    const query = parse(req.url, true).query
-    const result = await jokerify(query.response_url || query.text)
-    const { filename } = result.attachments[0]
+let rootRequestHandler = async (req, res) => {
+    try {
+        const query = parse(req.url, true).query
+        const result = await jokerify(query.text)
 
-    res.sendFile(filename, { root })
+        res.sendFile(result.attachments[0], { root })
+    } catch (error) {
+        console.error(err)
+        res.status(500)
+            .send(err)
+    }
 }
-
-rootRequestHandler.catch((error) => {
-    console.error(err)
-    res.status(500)
-        .send(err)
-})
 
 app.get('/', rootRequestHandler)
 
 const slackRequestHandler = async (req, res) => {
-    res.send({
-        response_type: 'in_channel',
-        text: 'working on it...'
-    })
-    const query = parse(req.url, true).query
-    const result = await jokerify(query.response_url || query.text)
-    const response_url = `${req.protocol}://${req.get('host')}/${result.filename}`
+    try {
+        res.send({
+            response_type: 'in_channel',
+            text: 'working on it...'
+        })
+        const query = parse(req.url, true).query
+        const result = await jokerify(query.response_url || query.text)
+        const response_url = `${req.protocol}://${req.get('host')}/${result.filename}`
 
-    if (!result) 
-        return Promise.reject(new Error('Empty result returned from the Jokerifier!'))
+        if (!result)
+            throw new Error('Empty result returned from the Jokerifier!')
 
-    const payload = {
-        response_type: 'in_channel',
-        response_url: result.responseUrl,
-        replace_original: true,
-        attachments: result.attachments
+        const payload = {
+            response_type: 'in_channel',
+            response_url: result.responseUrl,
+            replace_original: true,
+            attachments: result.attachments
+        }
+
+        console.log('slack response url: ', response_url)
+        console.log('slack post payload: ', payload)
+
+        post(response_url, { json: payload })
+    } catch (error) {
+        console.error(error);
+        res.status(200)
+            .send({ text: error.message })
     }
-
-    console.log('slack response url: ', response_url)
-    console.log('slack post payload: ', payload)
-
-    post(response_url, { json: payload })
-    
 }
-slackRequestHandler.catch((error) => {
-    console.error(error);
-    res.status(200)
-        .send({ text: error.message })
-})
 
 app.get('/api/slack', slackRequestHandler)
 
