@@ -1,0 +1,10 @@
+{
+  "protocol": "http",
+  "host": "localhost",
+  "port": "",
+  "debug": true,
+  "providers": {
+    "slack": true,
+    "discord": true
+  }
+}
