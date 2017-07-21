@@ -1,4 +1,6 @@
 const Discord = require('discord.js')
+const { default_handler } = require('./discord/default_handler')
+
 const client = new Discord.Client()
 
 // SETTINGS
@@ -12,18 +14,21 @@ const debug_mode = false
 if (!token) throw new Error('[Discord]: Empty token found! Please change the appropriate settings in discord.js')
 
 class message_handler {
-    constructor(command_type, callback) {
-        if (!command_type || (callback && !callback instanceof Promise))
+    constructor(discord, command_type, callback) {
+        if (!command_type || (callback && !callback instanceof Promise) || (discord && !discord instanceof discord_driver))
             throw new Error(`InvalidArgumentException: Malformed message_handler Registration.`)
 
         this.type = command_type
+        this.discord = discord
+
+        discord.registerMessageHandler(this)
         if (!callback) return
 
         this.emit = callback(parsed_message)
-        this.emit.catch(error => this.handle_error)
+        this.emit.catch(error => this.handle_error(error))
     }
 
-    async emit(message, cmd_args) {}
+    async emit(message, cmd_args) { }
 
     handle_error(error) { return console.error(error) }
     is_handler(obj) { obj && obj.type && obj.emit && obj.emit instanceof Promise }
@@ -37,7 +42,7 @@ const parseMessageContent = (content) =>
 class discord_driver {
     constructor(settings) {
         this.message_handlers = {}
-        this.url = settings.url;
+        this.url = settings.url
 
         client.on('ready', () => this.onReady())
         client.on('message', (message) => this.onMessage(message))
@@ -45,6 +50,7 @@ class discord_driver {
 
         if (debug_mode) client.on('debug', (info) => console.info(info))
 
+        this.registerMessageHandler(new default_handler(this))
         client.login(token)
             .catch(error => console.error(error))
     }

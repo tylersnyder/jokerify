@@ -72,12 +72,11 @@ function parseInput(input) {
 
 function compositeAndWrite({ canvas, joker, filename }) {
   return new Promise((resolve, reject) => {
-    if (canvas.bitmap.width > 800) {
+    if (canvas.bitmap.width > 800)
       canvas.resize(800, AUTO)
-    }
+    
 
-    const { width } = canvas.bitmap
-    const { height } = canvas.bitmap
+    const { width, height } = canvas.bitmap
     
     if(width<height)
       joker.resize(width * 0.5, AUTO)
@@ -89,11 +88,10 @@ function compositeAndWrite({ canvas, joker, filename }) {
 
     canvas
       .composite(joker, jokerWidth, jokerHeight)
-
       .write(`${dir}/${filename}`, (err) => {
-        if (err) {
+        if (err)
           return reject(err)
-        }
+        
 
         resolve('success')
       })
